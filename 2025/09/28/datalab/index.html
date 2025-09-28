@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0078E7"><meta name="author" content="py"><meta name="copyright" content="py"><meta name="generator" content="Hexo 7.3.0"><meta name="theme" content="hexo-theme-yun"><title>datalab | 我是py</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&amp;display=swap" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/star-markdown-css@0.4.1/dist/yun/yun-markdown.min.css"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/prism-theme-vars/base.css"><script src="https://fastly.jsdelivr.net/npm/scrollreveal/dist/scrollreveal.min.js" defer></script><script>function initScrollReveal() {
+  [".post-card",".markdown-body img"].forEach((target)=> {
+    ScrollReveal().reveal(target);
+  })
+}
+document.addEventListener("DOMContentLoaded", initScrollReveal);
+document.addEventListener("pjax:success", initScrollReveal);
+</script><link rel="icon" type="image/png" href="/favicon/favicon.ico"><link rel="mask-icon" href="/favicon/favicon.ico" color="#0078E7"><link rel="preload" href="/css/hexo-theme-yun.css" as="style"><link rel="prefetch" href="/js/sidebar.js" as="script"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fastly.jsdelivr.net/npm/" crossorigin><script id="yun-config">
+    window.Yun = {}
+    window.CONFIG = {"hostname":"juryorca.github.io","root":"/","title":"宇宙终极无敌猫猫虫大王","version":"1.10.11","mode":"auto","copycode":true,"page":{"isPost":true},"i18n":{"placeholder":"搜索...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）"},"anonymous_image":"https://cdn.yunyoujun.cn/img/avatar/none.jpg","say":{"api":"https://el-bot-api.vercel.app/api/words/young"},"fireworks":{"colors":null},"vendors":{"host":"https://fastly.jsdelivr.net/npm/","darken":"https://fastly.jsdelivr.net/npm/darken@1.5.0"}};
+  </script><link rel="stylesheet" href="/css/hexo-theme-yun.css"><script src="/js/hexo-theme-yun.js" type="module"></script><meta name="description" content="lab1-datalab 由于我大一寒假时写过logicalneg之前的题，这次实验我直接沿用了之前的bits.c,logicalneg前的函数代码里塞了一些没啥必要的注释。在报告里同样会写出思路，不影响报告格式。  INTEGER 部分:bitXor:用~和&amp;实现异或 。 1 0        0  1 1  And   11 1 -----&gt; 10 1        0  可以逆">
+<meta property="og:type" content="article">
+<meta property="og:title" content="datalab">
+<meta property="og:url" content="http://juryorca.github.io/2025/09/28/datalab/index.html">
+<meta property="og:site_name" content="我是py">
+<meta property="og:description" content="lab1-datalab 由于我大一寒假时写过logicalneg之前的题，这次实验我直接沿用了之前的bits.c,logicalneg前的函数代码里塞了一些没啥必要的注释。在报告里同样会写出思路，不影响报告格式。  INTEGER 部分:bitXor:用~和&amp;实现异或 。 1 0        0  1 1  And   11 1 -----&gt; 10 1        0  可以逆">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-09-28T08:33:25.000Z">
+<meta property="article:modified_time" content="2025-09-28T08:36:00.154Z">
+<meta property="article:author" content="py">
+<meta property="article:tag" content="ICS">
+<meta name="twitter:card" content="summary"><script>(function() {
+  if (CONFIG.mode !== 'auto') return
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  const setting = localStorage.getItem('darken-mode') || 'auto'
+  if (setting === 'dark' || (prefersDark && setting !== 'light'))
+    document.documentElement.classList.toggle('dark', true)
+})()</script></head><body><script src="https://code.iconify.design/2/2.1.1/iconify.min.js"></script><script>// Define global variable
+IconifyProviders = {
+  // Empty prefix: overwrite default API provider configuration
+  '': {
+    // Use custom API first, use Iconify public API as backup
+    resources: [
+        'https://api.iconify.design',
+    ],
+    // Wait for 1 second before switching API hosts
+    rotate: 1000,
+  },
+};</script><script defer src="https://fastly.jsdelivr.net/npm/animejs@latest"></script><script defer src="/js/ui/fireworks.js" type="module"></script><canvas class="fireworks"></canvas><div class="container"><a class="sidebar-toggle hty-icon-button" id="menu-btn"><div class="hamburger hamburger--spin" type="button"><span class="hamburger-box"><span class="hamburger-inner"></span></span></div></a><div class="sidebar-toggle sidebar-overlay"></div><aside class="sidebar"><script src="/js/sidebar.js" type="module"></script><ul class="sidebar-nav"><li class="sidebar-nav-item sidebar-nav-toc hty-icon-button sidebar-nav-active" data-target="post-toc-wrap" title="文章目录"><span class="icon iconify" data-icon="ri:list-ordered"></span></li><li class="sidebar-nav-item sidebar-nav-overview hty-icon-button" data-target="site-overview-wrap" title="站点概览"><span class="icon iconify" data-icon="ri:passport-line"></span></li></ul><div class="sidebar-panel" id="site-overview-wrap"><div class="site-info fix-top"><a class="site-author-avatar" href="/about/" title="py"><img width="96" loading="lazy" src="/images/avatar.jpg" alt="py"></a><div class="site-author-name"><a href="/about/">py</a></div><span class="site-name">我是py</span><sub class="site-subtitle">我是py</sub><div class="site-description">无敌奶龙大王cfy & cgxy和无敌疾旋鼬大王dcm</div></div><nav class="site-state"><a class="site-state-item hty-icon-button icon-home" href="/" title="首页"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:home-4-line"></span></span></a><div class="site-state-item"><a href="/archives/" title="归档"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:archive-line"></span></span><span class="site-state-item-count">11</span></a></div><div class="site-state-item"><a href="/categories/" title="分类"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:folder-2-line"></span></span><span class="site-state-item-count">0</span></a></div><div class="site-state-item"><a href="/tags/" title="标签"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:price-tag-3-line"></span></span><span class="site-state-item-count">5</span></a></div><a class="site-state-item hty-icon-button" target="_blank" rel="noopener" href="https://yun.yunyoujun.cn" title="文档"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:settings-line"></span></span></a></nav><hr style="margin-bottom:0.5rem"><div class="links-of-author"><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://github.com/Juryorca" title="GitHub" target="_blank" style="color:#8E71C1"><span class="icon iconify" data-icon="ri:github-line"></span></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://www.zhihu.com/people/i-wanna-41-50" title="知乎" target="_blank" style="color:#0084FF"><span class="icon iconify" data-icon="ri:zhihu-line"></span></a></div><hr style="margin:0.5rem 1rem"><div class="links"><a class="links-item hty-icon-button" href="/links/" title="都是大佬stO" style="color:dodgerblue"><span class="icon iconify" data-icon="ri:genderless-line"></span></a></div><br><a class="links-item hty-icon-button" id="toggle-mode-btn" href="javascript:;" title="Mode" style="color: #f1cb64"><span class="icon iconify" data-icon="ri:contrast-2-line"></span></a></div><div class="sidebar-panel sidebar-panel-active" id="post-toc-wrap"><div class="post-toc"><div class="post-toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#lab1-datalab"><span class="toc-number">1.</span> <span class="toc-text">lab1-datalab</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#INTEGER-%E9%83%A8%E5%88%86"><span class="toc-number">1.1.</span> <span class="toc-text">INTEGER 部分:</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#bitXor"><span class="toc-number">1.1.1.</span> <span class="toc-text">bitXor:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#tmin"><span class="toc-number">1.1.2.</span> <span class="toc-text">tmin:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#isTmax"><span class="toc-number">1.1.3.</span> <span class="toc-text">isTmax:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#allOddBits"><span class="toc-number">1.1.4.</span> <span class="toc-text">allOddBits:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#negate"><span class="toc-number">1.1.5.</span> <span class="toc-text">negate:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#isAsciiDigit"><span class="toc-number">1.1.6.</span> <span class="toc-text">isAsciiDigit:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#conditional"><span class="toc-number">1.1.7.</span> <span class="toc-text">conditional:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#isLessOrEqual"><span class="toc-number">1.1.8.</span> <span class="toc-text">isLessOrEqual</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#logicalNeg"><span class="toc-number">1.1.9.</span> <span class="toc-text">logicalNeg:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#howManyBits"><span class="toc-number">1.1.10.</span> <span class="toc-text">howManyBits:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#floatScale2"><span class="toc-number">1.1.11.</span> <span class="toc-text">floatScale2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#floatFloat2Int"><span class="toc-number">1.1.12.</span> <span class="toc-text">floatFloat2Int</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#floatPower2"><span class="toc-number">1.1.13.</span> <span class="toc-text">floatPower2</span></a></li></ol></li></ol></li></ol></div></div></div></aside><main class="sidebar-translate" id="content"><div id="post"><article class="hty-card post-block" itemscope itemtype="https://schema.org/Article" style="--smc-primary:#0078E7;"><link itemprop="mainEntityOfPage" href="http://Juryorca.github.io/2025/09/28/datalab/"><span hidden itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="py"><meta itemprop="description"></span><span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="我是py"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">datalab</h1><div class="post-meta"><div class="post-time"><span class="post-meta-item-icon"><span class="icon iconify" data-icon="ri:calendar-line"></span></span> <time title="创建时间：2025-09-28 16:33:25" itemprop="dateCreated datePublished" datetime="2025-09-28T16:33:25+08:00">2025-09-28</time></div><div class="post-classify"><span class="post-tag"><a class="tag-item" href="/tags/ICS/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><span class="icon iconify" data-icon="ri:price-tag-3-line"></span></span><span class="tag-name">ICS</span></a></span></div></div></header><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body"><h2 id="lab1-datalab"><a href="#lab1-datalab" class="headerlink" title="lab1-datalab"></a>lab1-datalab</h2><blockquote>
+<p>由于我大一寒假时写过logicalneg之前的题，这次实验我直接沿用了之前的bits.c,logicalneg前的函数代码里塞了一些没啥必要的注释。在报告里同样会写出思路，不影响报告格式。</p>
+</blockquote>
+<h3 id="INTEGER-部分"><a href="#INTEGER-部分" class="headerlink" title="INTEGER 部分:"></a>INTEGER 部分:</h3><h4 id="bitXor"><a href="#bitXor" class="headerlink" title="bitXor:"></a>bitXor:</h4><p><strong>用~和&amp;实现异或</strong> 。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1 0        0  </span><br><span class="line">1 1  And   1</span><br><span class="line">1 1 -----&gt; 1</span><br><span class="line">0 1        0</span><br></pre></td></tr></table></figure>
+
+<p>可以逆推出异或的前一步是构造出这样的真值表结果，这种三个1一个0的结果通过~和&amp; 很容易构造出来</p>
+<p>0111 可以看成或运算 用德摩根定律也可以转化为~和&amp; </p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a = ~(x&amp;y);</span><br><span class="line"><span class="type">int</span> b = ~(~x&amp;~y);</span><br><span class="line"><span class="keyword">return</span> a&amp;b;</span><br></pre></td></tr></table></figure>
+
+<h4 id="tmin"><a href="#tmin" class="headerlink" title="tmin:"></a>tmin:</h4><p>tmin就是二进制补码数的最小值，直接把1移到最高位就行了</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="number">1</span>&lt;&lt;<span class="number">31</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="isTmax"><a href="#isTmax" class="headerlink" title="isTmax:"></a>isTmax:</h4><p>对于Tmax 有个性质是+1会变成Tmin , 他们在位上正好是完全相反的，两者异或可以得到-1，在其他数之中只有-1 也有相同的性质。 只要排除这个情况就行了。 正好-1 + 1又等于0, !(-1+1) 和 !(Tmax +1 ) 是不同的 可以他们整合到最后的判断算式中。</p>
+<p>我整合的方法是先计算(x &amp; (x+1) ) ，再计算!(x+1) 只有两者都为0 ，才返回1 用一个加法和一个! 就能实现.</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> y=x+<span class="number">1</span>;</span><br><span class="line"><span class="type">int</span> z=(x^y)+<span class="number">1</span>;</span><br><span class="line"><span class="keyword">return</span> !(z+!y);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="allOddBits"><a href="#allOddBits" class="headerlink" title="allOddBits:"></a>allOddBits:</h4><p>如果所有奇数位都是1就返回1。这里我想到掩码，构造一个奇数位都是1的数t ，让它和 x 与 ，就能单独取出奇数位 然后和t异或 ，只有和t完全一致，才能得到0  ,!之后就能得到1</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> t=(<span class="number">0xAA</span>&lt;&lt;<span class="number">24</span>)+(<span class="number">0xAA</span>&lt;&lt;<span class="number">16</span>)+(<span class="number">0xAA</span>&lt;&lt;<span class="number">8</span>)+(<span class="number">0xAA</span>);</span><br><span class="line"><span class="keyword">return</span> !(t^(x&amp;t));</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="negate"><a href="#negate" class="headerlink" title="negate:"></a>negate:</h4><p>返回-x, 很老套的方法？ 直接返回~x +1 就行了</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">return</span> ~x + <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="isAsciiDigit"><a href="#isAsciiDigit" class="headerlink" title="isAsciiDigit:"></a>isAsciiDigit:</h4><p>ascii数字从0x30到0x39， 先观察这些数字的共同特性 , 0x30是0b0110000,0x39 是 0b0111001, 可以发现有很大一部分由0b0110开头 ，并且是他们特有的 ，先判断是不是这样的数据，然后单独处理0x38和0x39。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">return</span> !((x&gt;&gt;<span class="number">3</span>)^<span class="number">0x6</span>)|!(x^<span class="number">0x39</span>)|!(x^<span class="number">0x38</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="conditional"><a href="#conditional" class="headerlink" title="conditional:"></a>conditional:</h4><p>实现条件取值。 </p>
+<p>if(x) 相当于 if (!!x)  ， 我的思路是将!x 扩大32位，然后对两者进行掩码，再用|合并，那么就要控制x不为0时 取 全1或全0 ，为0时全0或全1</p>
+<p>我利用了-1+1 可以在这两种取值突变的特性实现上述功能。 </p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">  <span class="type">int</span> t=!x+~<span class="number">0</span>;</span><br><span class="line">  <span class="keyword">return</span> (t&amp;y)|(~t&amp;z);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="isLessOrEqual"><a href="#isLessOrEqual" class="headerlink" title="isLessOrEqual"></a>isLessOrEqual</h4><p>我直接用了个非常笨的方法 ，把一个是正数一个负数的情况直接判断出来。如果两个数符号相同 就 判断 x-y-1 是不是正数或者0 正好-y 是 ~y + 1 还省了一个1</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> p=(x&gt;&gt;<span class="number">31</span>)&amp;<span class="number">1</span>;</span><br><span class="line"><span class="type">int</span> q=(y&gt;&gt;<span class="number">31</span>)&amp;<span class="number">1</span>;</span><br><span class="line"><span class="type">int</span> t=(p^q)&amp;p;</span><br><span class="line"><span class="type">int</span> b=(!(p^q))&amp;((x+~y)&gt;&gt;<span class="number">31</span>);</span><br><span class="line"><span class="keyword">return</span> b|t;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="logicalNeg"><a href="#logicalNeg" class="headerlink" title="logicalNeg:"></a>logicalNeg:</h4><p>实现!的功能。我想到了0的一个特殊的特性 -0 &#x3D; 0; 那么我只要判断 ~x + 1 和原来的数据是否是相等的 ，但是要小心tmin 因为 -tmin仍然是tmin  。 我做这题时用了另外一个判断方法，就是判断是否一正一负。这样可以通过或的特性排除掉tmin全负的情况。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a = ~x+<span class="number">1</span>;</span><br><span class="line"> <span class="type">int</span> p = (x&gt;&gt;<span class="number">31</span>)&amp;<span class="number">1</span>;</span><br><span class="line"> <span class="type">int</span> q = (a&gt;&gt;<span class="number">31</span>)&amp;<span class="number">1</span>;</span><br><span class="line"> <span class="keyword">return</span> (p|q)^<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="howManyBits"><a href="#howManyBits" class="headerlink" title="howManyBits:"></a>howManyBits:</h4><p>先观察规律，发现对于正数和负数都是一样的: 找到第一个变化的位 ，然后再加上1。</p>
+<p>利用算数右移可以根据第一位来选择性的取反,这样就统一成一种情况了x &#x3D; x^(x&gt;&gt;31);</p>
+<p>之后的目标就是找到第一个1的位置 ，最开始我的想法是逐个查找，但是30个位的 + &gt;&gt; ! 就已经超过90了，需要更强大的查找算法。于是我想到了二分查找: 用p对分割进行标记，如果分割左侧有1 ，就缩小范围到p左侧 ，否则到p右侧。</p>
+<p>例如p等于32时，分割如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0x0000 | 0x0000</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>那么问题就转化成了如何实现在受限情况下更简洁的二分查找。 这让我想到了c语言编译器对if的一种优化 : 转化分支为条件赋值。例如 第一次查找 ，p&#x3D;32 ,先假设左边没有1 也就是 p &#x3D; 16; 如果左边有1，再将 p + 32即可，用代码表示就是</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">p=<span class="number">32</span>;</span><br><span class="line">p = <span class="number">16</span>+((!!(x&gt;&gt;p))&lt;&lt;<span class="number">5</span>);</span><br></pre></td></tr></table></figure>
+
+<p>同时这么做有个好处 ，假设这一次运行完后p等于48 ,需要先-8 ,就可以用异或实现 ，因为p在16的位置一定是 1, 8 的位置一定是0.</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">p = (p^<span class="number">24</span>) + ((!!(x&gt;&gt;p))&lt;&lt;<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+
+<p>需要特殊处理的是最后在2位的区间内查找，此时不应该进行先-1，因为之后并没有再缩小区间的需求了。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">p = p+ ((!!(x&gt;&gt;p)));</span><br></pre></td></tr></table></figure>
+
+<p>还有一个特殊情况是全0 ，可以当作在第-1位有一个1,我的上述算法并不能判断出这个情况，因此要单独处理 </p>
+<p>综上，代码为</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"> <span class="type">int</span> p ;</span><br><span class="line"> x = x^(x&gt;&gt;<span class="number">31</span>);</span><br><span class="line"> p=<span class="number">32</span>;</span><br><span class="line"> p = <span class="number">16</span>+((!!(x&gt;&gt;p))&lt;&lt;<span class="number">5</span>);</span><br><span class="line"> p = (p^<span class="number">24</span>) + ((!!(x&gt;&gt;p))&lt;&lt;<span class="number">4</span>);</span><br><span class="line"> p = (p^<span class="number">12</span> ) + ((!!(x&gt;&gt;p))&lt;&lt;<span class="number">3</span>);</span><br><span class="line"> p = (p^<span class="number">6</span>) + ((!!(x&gt;&gt;p))&lt;&lt;<span class="number">2</span>);</span><br><span class="line"> p = (p^<span class="number">3</span>) + ((!!(x&gt;&gt;p))&lt;&lt;<span class="number">1</span>);</span><br><span class="line"> p = p+ ((!!(x&gt;&gt;p)));</span><br><span class="line"><span class="keyword">return</span> p+(<span class="number">1</span>^( !(x)));</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="floatScale2"><a href="#floatScale2" class="headerlink" title="floatScale2"></a>floatScale2</h4><p>实现 浮点数*2 。</p>
+<p>考虑三种情况 inf， 规格数，0 。</p>
+<p>inf时直接返回。</p>
+<p>规格数时 令阶码+1 </p>
+<p>0时 ，根据IEEE规定的特性 假设有0b 0.1111 , 要使其翻倍 ，即变成 0 b 1.1110 ,反映在浮点数中 ，由于规格数 1和 0 ，都是x**-126  , 最终只需要让尾数整体左移 </p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">  <span class="type">int</span> T;</span><br><span class="line">  T = uf;</span><br><span class="line">  T = (T&lt;&lt;<span class="number">1</span>)&gt;&gt;<span class="number">24</span>;</span><br><span class="line">  <span class="keyword">if</span>(T+<span class="number">1</span>)&#123;</span><br><span class="line">      <span class="keyword">if</span>(T)&#123;</span><br><span class="line">          <span class="keyword">return</span> uf+(<span class="number">0x00800000</span>);</span><br><span class="line">      &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">          <span class="keyword">return</span> (uf&lt;&lt;<span class="number">1</span>)+(uf&amp;(<span class="number">0x80000000</span>));</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">return</span> uf;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="floatFloat2Int"><a href="#floatFloat2Int" class="headerlink" title="floatFloat2Int"></a>floatFloat2Int</h4><p>总体上分三种情况 </p>
+<p>exp - 127 &gt;&#x3D; 31,此时过大 返回0x80000000。</p>
+<p>exp - 127 &lt;0 此时过小 返回0。</p>
+<p>之后还可以细分成两个情况。</p>
+<p>exp - 127 &lt; 23 时 这时候应该让尾数右移，因为尾数最低位是2的-23次方。</p>
+<p>exp -127 &gt;&#x3D;23 时，这时候尾数左移。</p>
+<p>另外还要考虑符号位 ，最后根据符号位判断是否取负值</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">floatFloat2Int</span><span class="params">(<span class="type">unsigned</span> uf)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> <span class="built_in">exp</span> =  (uf&lt;&lt;<span class="number">1</span>)&gt;&gt;<span class="number">24</span>;</span><br><span class="line">    <span class="type">unsigned</span> frac = (uf&amp;<span class="number">0x7FFFFF</span>)|(<span class="number">1</span>&lt;&lt;<span class="number">23</span>);</span><br><span class="line">    <span class="type">int</span> T = <span class="built_in">exp</span> - <span class="number">127</span>;</span><br><span class="line">    <span class="keyword">if</span>( T &lt; <span class="number">0</span> ) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span>( T &gt;= <span class="number">31</span> ) <span class="keyword">return</span> <span class="number">0x80000000</span>;</span><br><span class="line">    <span class="keyword">if</span>( T &lt; <span class="number">23</span> )  frac &gt;&gt;= ( <span class="number">23</span> - T);</span><br><span class="line">    <span class="keyword">else</span> frac &lt;&lt;=(T<span class="number">-23</span>);</span><br><span class="line">    <span class="keyword">if</span>(uf&gt;&gt;<span class="number">31</span>) <span class="keyword">return</span> -frac;</span><br><span class="line">    <span class="keyword">return</span> frac;</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>C99 开始 规定负数向0截断，这使得在负数情况下 这种直接取反的行为是合理的。</p>
+</blockquote>
+<h4 id="floatPower2"><a href="#floatPower2" class="headerlink" title="floatPower2"></a>floatPower2</h4><p>考虑三种情况</p>
+<p>过大时直接返回+inf</p>
+<p>不过大时 如果&gt;0 只需要依靠阶码，如果&lt;0 ,在&lt;-126 的情况下 还可以用到尾数 ，也就是说最多可以表示到-149</p>
+<p>过小时返回0 </p>
+<p>按照上述几种情况分别实现即可</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (x &gt; <span class="number">127</span>) <span class="keyword">return</span> <span class="number">0x7f800000</span>;</span><br><span class="line"><span class="keyword">if</span> (x &lt;(- <span class="number">149</span>)) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"><span class="keyword">if</span> (<span class="number">-126</span> &lt;= x) <span class="keyword">return</span> (x + <span class="number">127</span>)&lt;&lt;<span class="number">23</span>;</span><br><span class="line"><span class="keyword">return</span> <span class="number">0x400000</span> &gt;&gt; (<span class="number">-126</span> - x);</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>另外，在浮点数部分有个规则是禁止任何形式的类型转换，我认为这里应该理解为禁止对位级存储规则进行转换，否则这和给出的另一个规则: 可以使用任何integer&#x2F;unsigned operations 是矛盾的。</p>
+</blockquote>
+<p>btest在最后一个函数卡了很久 不过strace发现题目设置的是alarm(10) , 并没有超出时间,但不知道为何会卡这么久。</p>
+</div></section><div id="reward-container"><span class="hty-icon-button button-glow" id="reward-button" title="打赏" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === &quot;none&quot;) ? &quot;block&quot; : &quot;none&quot;;"><span class="icon iconify" data-icon="ri:hand-coin-line"></span></span><div id="reward-comment">v我50.</div><div id="qr" style="display:none;"><div style="display:inline-block"><a href="/QRpay/WechatPay.jpg"><img loading="lazy" src="/QRpay/WechatPay.jpg" alt="微信" title="微信"></a><div><span style="color:#2DC100"><span class="icon iconify" data-icon="ri:wechat-pay-line"></span></span></div></div></div></div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>py</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="http://juryorca.github.io/2025/09/28/datalab/" title="datalab">http://juryorca.github.io/2025/09/28/datalab/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>本博客所有文章除特别声明外，均默认采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" title="CC BY-NC-SA 4.0 "><span class="icon iconify" data-icon="ri:creative-commons-line"></span><span class="icon iconify" data-icon="ri:creative-commons-by-line"></span><span class="icon iconify" data-icon="ri:creative-commons-nc-line"></span><span class="icon iconify" data-icon="ri:creative-commons-sa-line"></span></a> 许可协议。</li></ul></article><div class="post-nav"><div class="post-nav-item"></div><div class="post-nav-item"><a class="post-nav-next" href="/2025/09/16/%E6%95%B0%E5%AD%97%E9%80%BB%E8%BE%91%E5%AE%9E%E9%AA%8C%E8%A7%86%E9%A2%91/" rel="next" title="数字逻辑实验视频"><span class="post-nav-text">数字逻辑实验视频</span><span class="icon iconify" data-icon="ri:arrow-right-s-line"></span></a></div></div></div><div class="hty-card" id="comment"></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2019 – 2025 </span><span class="with-love" id="animate"><span class="icon iconify" data-icon="ri:cloud-line"></span></span><span class="author"> py</span></div><div class="powered"><span>由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v7.3.0</span><span class="footer-separator">|</span><span>主题 - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.10.11</span></div></footer></div><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><span class="icon iconify" data-icon="ri:arrow-up-s-line"></span><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a><script src="https://fastly.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script><script>const images = [...document.querySelectorAll('.markdown-body img')]
+mediumZoom(images)</script><style>.medium-zoom-image {
+  z-index: 99;
+}</style></body></html>
