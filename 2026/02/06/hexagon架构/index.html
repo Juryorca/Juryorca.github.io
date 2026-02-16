@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0078E7"><meta name="author" content="py"><meta name="copyright" content="py"><meta name="generator" content="Hexo 7.3.0"><meta name="theme" content="hexo-theme-yun"><title>hexagon架构 | 我是py</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&amp;display=swap" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/star-markdown-css@0.4.1/dist/yun/yun-markdown.min.css"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/prism-theme-vars/base.css"><script src="https://fastly.jsdelivr.net/npm/scrollreveal/dist/scrollreveal.min.js" defer></script><script>function initScrollReveal() {
+  [".post-card",".markdown-body img"].forEach((target)=> {
+    ScrollReveal().reveal(target);
+  })
+}
+document.addEventListener("DOMContentLoaded", initScrollReveal);
+document.addEventListener("pjax:success", initScrollReveal);
+</script><link rel="icon" type="image/png" href="/favicon/favicon.ico"><link rel="mask-icon" href="/favicon/favicon.ico" color="#0078E7"><link rel="preload" href="/css/hexo-theme-yun.css" as="style"><link rel="prefetch" href="/js/sidebar.js" as="script"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fastly.jsdelivr.net/npm/" crossorigin><script id="yun-config">
+    window.Yun = {}
+    window.CONFIG = {"hostname":"juryorca.github.io","root":"/","title":"宇宙终极无敌猫猫虫大王","version":"1.10.11","mode":"auto","copycode":true,"page":{"isPost":true},"i18n":{"placeholder":"搜索...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）"},"anonymous_image":"https://cdn.yunyoujun.cn/img/avatar/none.jpg","say":{"api":"https://el-bot-api.vercel.app/api/words/young"},"fireworks":{"colors":null},"vendors":{"host":"https://fastly.jsdelivr.net/npm/","darken":"https://fastly.jsdelivr.net/npm/darken@1.5.0"}};
+  </script><link rel="stylesheet" href="/css/hexo-theme-yun.css"><script src="/js/hexo-theme-yun.js" type="module"></script><meta name="description" content="Packet &amp; .newPacket : &#123;...&#125;花括号表示一instruction packet ，在 packet内，多条指令逻辑上并发，但有上限，硬件允许受限的依赖前递。 .new: 在packet标识需要用到的前递rX.new：引用本 packet 内刚产生的 rX。 p0.new：引用本 packet 内刚产生的谓词 p0。  在  Hexagon 里，谓">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hexagon架构">
+<meta property="og:url" content="http://juryorca.github.io/2026/02/06/hexagon%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:site_name" content="我是py">
+<meta property="og:description" content="Packet &amp; .newPacket : &#123;...&#125;花括号表示一instruction packet ，在 packet内，多条指令逻辑上并发，但有上限，硬件允许受限的依赖前递。 .new: 在packet标识需要用到的前递rX.new：引用本 packet 内刚产生的 rX。 p0.new：引用本 packet 内刚产生的谓词 p0。  在  Hexagon 里，谓">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://juryorca.github.io/2026/02/06/hexagon%E6%9E%B6%E6%9E%84/manage.png">
+<meta property="article:published_time" content="2026-02-06T03:22:01.000Z">
+<meta property="article:modified_time" content="2026-02-16T01:45:36.178Z">
+<meta property="article:author" content="py">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://juryorca.github.io/2026/02/06/hexagon%E6%9E%B6%E6%9E%84/manage.png"><script>(function() {
+  if (CONFIG.mode !== 'auto') return
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  const setting = localStorage.getItem('darken-mode') || 'auto'
+  if (setting === 'dark' || (prefersDark && setting !== 'light'))
+    document.documentElement.classList.toggle('dark', true)
+})()</script></head><body><script src="https://code.iconify.design/2/2.1.1/iconify.min.js"></script><script>// Define global variable
+IconifyProviders = {
+  // Empty prefix: overwrite default API provider configuration
+  '': {
+    // Use custom API first, use Iconify public API as backup
+    resources: [
+        'https://api.iconify.design',
+    ],
+    // Wait for 1 second before switching API hosts
+    rotate: 1000,
+  },
+};</script><script defer src="https://fastly.jsdelivr.net/npm/animejs@latest"></script><script defer src="/js/ui/fireworks.js" type="module"></script><canvas class="fireworks"></canvas><div class="container"><a class="sidebar-toggle hty-icon-button" id="menu-btn"><div class="hamburger hamburger--spin" type="button"><span class="hamburger-box"><span class="hamburger-inner"></span></span></div></a><div class="sidebar-toggle sidebar-overlay"></div><aside class="sidebar"><script src="/js/sidebar.js" type="module"></script><ul class="sidebar-nav"><li class="sidebar-nav-item sidebar-nav-toc hty-icon-button sidebar-nav-active" data-target="post-toc-wrap" title="文章目录"><span class="icon iconify" data-icon="ri:list-ordered"></span></li><li class="sidebar-nav-item sidebar-nav-overview hty-icon-button" data-target="site-overview-wrap" title="站点概览"><span class="icon iconify" data-icon="ri:passport-line"></span></li></ul><div class="sidebar-panel" id="site-overview-wrap"><div class="site-info fix-top"><a class="site-author-avatar" href="/about/" title="py"><img width="96" loading="lazy" src="/images/avatar.jpg" alt="py"></a><div class="site-author-name"><a href="/about/">py</a></div><span class="site-name">我是py</span><sub class="site-subtitle">我是py</sub><div class="site-description">无敌奶龙大王cfy & cgxy和无敌疾旋鼬大王dcm</div></div><nav class="site-state"><a class="site-state-item hty-icon-button icon-home" href="/" title="首页"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:home-4-line"></span></span></a><div class="site-state-item"><a href="/archives/" title="归档"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:archive-line"></span></span><span class="site-state-item-count">23</span></a></div><div class="site-state-item"><a href="/categories/" title="分类"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:folder-2-line"></span></span><span class="site-state-item-count">0</span></a></div><div class="site-state-item"><a href="/tags/" title="标签"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:price-tag-3-line"></span></span><span class="site-state-item-count">8</span></a></div><a class="site-state-item hty-icon-button" target="_blank" rel="noopener" href="https://yun.yunyoujun.cn" title="文档"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:settings-line"></span></span></a></nav><hr style="margin-bottom:0.5rem"><div class="links-of-author"><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://github.com/Juryorca" title="GitHub" target="_blank" style="color:#8E71C1"><span class="icon iconify" data-icon="ri:github-line"></span></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://www.zhihu.com/people/i-wanna-41-50" title="知乎" target="_blank" style="color:#0084FF"><span class="icon iconify" data-icon="ri:zhihu-line"></span></a></div><hr style="margin:0.5rem 1rem"><div class="links"><a class="links-item hty-icon-button" href="/links/" title="都是大佬stO" style="color:dodgerblue"><span class="icon iconify" data-icon="ri:genderless-line"></span></a></div><br><a class="links-item hty-icon-button" id="toggle-mode-btn" href="javascript:;" title="Mode" style="color: #f1cb64"><span class="icon iconify" data-icon="ri:contrast-2-line"></span></a></div><div class="sidebar-panel sidebar-panel-active" id="post-toc-wrap"><div class="post-toc"><div class="post-toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Packet-new"><span class="toc-number">1.</span> <span class="toc-text">Packet &amp; .new</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Packet"><span class="toc-number">1.1.</span> <span class="toc-text">Packet : {...}</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#new-%E5%9C%A8packet%E6%A0%87%E8%AF%86%E9%9C%80%E8%A6%81%E7%94%A8%E5%88%B0%E7%9A%84%E5%89%8D%E9%80%92"><span class="toc-number">1.2.</span> <span class="toc-text">.new: 在packet标识需要用到的前递</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%8E%E5%AF%84%E5%AD%98%E5%99%A8%E5%AF%B9"><span class="toc-number">2.</span> <span class="toc-text">寄存器与寄存器对</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE%E6%8C%87%E4%BB%A4"><span class="toc-number">3.</span> <span class="toc-text">内存访问指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#load-store"><span class="toc-number">3.1.</span> <span class="toc-text">load&#x2F;store</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#post-increment"><span class="toc-number">3.2.</span> <span class="toc-text">post-increment</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#imm-pcrel%EF%BC%88%E5%A4%A7%E7%AB%8B%E5%8D%B3%E6%95%B0-%E9%87%8D%E5%AE%9A%E4%BD%8D%EF%BC%89"><span class="toc-number">3.3.</span> <span class="toc-text">##imm &#x2F; @pcrel（大立即数&#x2F;重定位）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E6%95%B0%E4%B8%8E%E9%80%BB%E8%BE%91"><span class="toc-number">4.</span> <span class="toc-text">算数与逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E5%87%8F"><span class="toc-number">4.1.</span> <span class="toc-text">加减</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8D%E8%BF%90%E7%AE%97"><span class="toc-number">4.2.</span> <span class="toc-text">位运算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A7%BB%E4%BD%8D"><span class="toc-number">4.3.</span> <span class="toc-text">移位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96"><span class="toc-number">4.4.</span> <span class="toc-text">其他</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AF%94%E8%BE%83%E3%80%81%E8%B0%93%E8%AF%8D%E4%B8%8E%E6%9D%A1%E4%BB%B6%E6%89%A7%E8%A1%8C"><span class="toc-number">5.</span> <span class="toc-text">比较、谓词与条件执行</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AF%94%E8%BE%83%E7%94%9F%E6%88%90%E8%B0%93%E8%AF%8D"><span class="toc-number">5.1.</span> <span class="toc-text">比较生成谓词</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E8%B0%93%E8%AF%8D%E5%8C%96%E6%89%A7%E8%A1%8C%EF%BC%88Predication%EF%BC%89"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 谓词化执行（Predication）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8D%E6%B5%8B%E8%AF%95-%E7%BD%AE%E4%BD%8D-%E6%B8%85%E4%BD%8D"><span class="toc-number">5.3.</span> <span class="toc-text">位测试&#x2F;置位&#x2F;清位</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E6%B5%81"><span class="toc-number">6.</span> <span class="toc-text">控制流</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%B3%E8%BD%AC"><span class="toc-number">6.1.</span> <span class="toc-text">跳转</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E8%B0%83%E7%94%A8"><span class="toc-number">6.2.</span> <span class="toc-text">6.2 调用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E8%BF%94%E5%9B%9E-%E6%A0%88%E5%B8%A7"><span class="toc-number">6.3.</span> <span class="toc-text">6.3 返回&#x2F;栈帧</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6%E9%9B%B6%E5%BC%80%E9%94%80%E5%BE%AA%E7%8E%AF"><span class="toc-number">7.</span> <span class="toc-text">硬件零开销循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%AD%90-%E9%94%81%EF%BC%9Amemw-locked"><span class="toc-number">8.</span> <span class="toc-text">原子&#x2F;锁：memw_locked</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#trap0-1"><span class="toc-number">9.</span> <span class="toc-text">trap0(#1)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lilac-ctf-Gateway"><span class="toc-number">10.</span> <span class="toc-text">lilac-ctf Gateway</span></a></li></ol></div></div></div></aside><main class="sidebar-translate" id="content"><div id="post"><article class="hty-card post-block" itemscope itemtype="https://schema.org/Article" style="--smc-primary:#0078E7;"><link itemprop="mainEntityOfPage" href="http://Juryorca.github.io/2026/02/06/hexagon%E6%9E%B6%E6%9E%84/"><span hidden itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="py"><meta itemprop="description"></span><span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="我是py"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">hexagon架构</h1><div class="post-meta"><div class="post-time"><span class="post-meta-item-icon"><span class="icon iconify" data-icon="ri:calendar-line"></span></span> <time title="创建时间：2026-02-06 11:22:01" itemprop="dateCreated datePublished" datetime="2026-02-06T11:22:01+08:00">2026-02-06</time><span class="post-meta-divider">-</span><span class="post-meta-item-icon"><span class="icon iconify" data-icon="ri:calendar-2-line"></span></span> <time title="修改时间：2026-02-16 09:45:36" itemprop="dateModified" datetime="2026-02-16T09:45:36+08:00">2026-02-16</time></div><div class="post-classify"><span class="post-tag"><a class="tag-item" href="/tags/pwn/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><span class="icon iconify" data-icon="ri:price-tag-3-line"></span></span><span class="tag-name">pwn</span></a></span></div></div></header><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body"><h2 id="Packet-new"><a href="#Packet-new" class="headerlink" title="Packet &amp; .new"></a>Packet &amp; .new</h2><h3 id="Packet"><a href="#Packet" class="headerlink" title="Packet : {...}"></a><code>Packet</code> : <code>&#123;...&#125;</code></h3><p>花括号表示一<code>instruction packet</code> ，在 <code>packet</code>内，多条指令逻辑上并发，但有上限，硬件允许受限的依赖前递。</p>
+<h3 id="new-在packet标识需要用到的前递"><a href="#new-在packet标识需要用到的前递" class="headerlink" title=".new: 在packet标识需要用到的前递"></a><code>.new</code>: 在packet标识需要用到的前递</h3><p><code>rX.new</code>：引用本 packet 内<strong>刚产生</strong>的 rX。</p>
+<p><code>p0.new</code>：引用本 packet 内<strong>刚产生</strong>的谓词 p0。</p>
+<blockquote>
+<p>在  Hexagon 里，谓词 (predicate) 就是布尔寄存器，专门用来做“条件执行” 和 “条件跳转”。</p>
+</blockquote>
+<p>比如</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">&#123; if (p0.new) jump:nt loc_2552C</span><br><span class="line">  p0 = cmp.gt(r7, ##0x7FE ) &#125;</span><br></pre></td></tr></table></figure>
+
+<p>p0.new就是后面<code>cmp</code>获得的谓词。</p>
+<p>注意<code>packet</code>里的两个指令是没有先后顺序的。</p>
+<h2 id="寄存器与寄存器对"><a href="#寄存器与寄存器对" class="headerlink" title="寄存器与寄存器对"></a>寄存器与寄存器对</h2><ul>
+<li>通用寄存器:<code> r0-r31</code></li>
+<li>谓词寄存器: <code>p0 - ? </code></li>
+<li>特殊寄存器: <code>sp</code> (栈指针)  、 <code>lr</code> (返回地址) 、 <code>pc</code> 、<code>ugp</code> （user global pointer）</li>
+<li>寄存器对: <code>rY:X</code> 表示64-bit值 (低 32 位通常在右侧寄存器 <code>rX</code>)</li>
+</ul>
+<h2 id="内存访问指令"><a href="#内存访问指令" class="headerlink" title="内存访问指令"></a>内存访问指令</h2><h3 id="load-store"><a href="#load-store" class="headerlink" title="load&#x2F;store"></a>load&#x2F;store</h3><ul>
+<li><code>memw(addr)</code> : 32-bit </li>
+<li><code>memh(addr)</code> : 16-bit </li>
+<li><code>memb(addr)</code>: 8-bit</li>
+<li><code>memub(addr)</code>: unsigned 8-bit</li>
+<li><code>memd(addr)</code>: 64-bit load</li>
+</ul>
+<p> 通过等号可以很轻松的区分是load还是store</p>
+<h3 id="post-increment"><a href="#post-increment" class="headerlink" title="post-increment"></a>post-increment</h3><p>$rY &#x3D; mem^*(rA++ #imm)$</p>
+<p>用C语言的形式来理解 非常像</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">rY = *rA++</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>r2 = memub(r1++ #1)</code>：读 <code>*(uint8_t*)r1</code>，然后 <code>r1++</code></p>
+<h3 id="imm-pcrel（大立即数-重定位）"><a href="#imm-pcrel（大立即数-重定位）" class="headerlink" title="##imm &#x2F; @pcrel（大立即数&#x2F;重定位）"></a><code>##imm</code> &#x2F; <code>@pcrel</code>（大立即数&#x2F;重定位）</h3><ul>
+<li><code>add(pc, ##sym@pcrel)</code>：得到符号地址（PC 相对重定位），类似 “取全局地址&#x2F;常量池地址”。</li>
+<li><code>memw(r0 + ##-0x101EC)</code>：带大立即数偏移的寻址（常见于访问 GOT&#x2F;全局区&#x2F;固定偏移表）。</li>
+</ul>
+<h2 id="算数与逻辑"><a href="#算数与逻辑" class="headerlink" title="算数与逻辑"></a>算数与逻辑</h2><h3 id="加减"><a href="#加减" class="headerlink" title="加减"></a>加减</h3><ul>
+<li><code>add(rA , rB)</code> &#x2F; <code>add(rA , #imm)</code></li>
+<li><code>sub(rA,rB)</code> &#x2F; <code>sub(rA, #imm)</code></li>
+<li><code>neg(rX)</code> : <code>rX = -rX</code></li>
+</ul>
+<h3 id="位运算"><a href="#位运算" class="headerlink" title="位运算"></a>位运算</h3><p>and \ or \ xor \not</p>
+<p>形式和加减差不多</p>
+<h3 id="移位"><a href="#移位" class="headerlink" title="移位"></a>移位</h3><ul>
+<li><code>asl(rX, #n)</code> : 算术左移</li>
+<li><code>lsr(rX, #n)</code>: 逻辑右移</li>
+</ul>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p><code>addasl(rA, rB, $n)</code> </p>
+<p><code>r13 = addasl(r1, r0, #1)</code> ⇒ <code>r13 = r1 + (r0 &lt;&lt; 1)</code></p>
+<p><code>mpyi(rX , #imm)</code> : 乘立即数</p>
+<h2 id="比较、谓词与条件执行"><a href="#比较、谓词与条件执行" class="headerlink" title="比较、谓词与条件执行"></a>比较、谓词与条件执行</h2><h3 id="比较生成谓词"><a href="#比较生成谓词" class="headerlink" title="比较生成谓词"></a>比较生成谓词</h3><ul>
+<li><code>p0 = cmp.eq(rA, rB/#imm)</code>：相等</li>
+<li><code>p0 = cmp.gt(rA, rB/#imm)</code>：有符号大于</li>
+<li><code>p0 = cmp.gtu(rA, rB/#imm)</code>：无符号大于</li>
+</ul>
+<h3 id="5-2-谓词化执行（Predication）"><a href="#5-2-谓词化执行（Predication）" class="headerlink" title="5.2 谓词化执行（Predication）"></a>5.2 谓词化执行（Predication）</h3><ul>
+<li><code>if (p0) insn</code></li>
+<li><code>if (!p0) insn</code></li>
+<li><code>if (p0.new)</code>：使用同 packet 内刚生成的 p0</li>
+</ul>
+<h3 id="位测试-置位-清位"><a href="#位测试-置位-清位" class="headerlink" title="位测试&#x2F;置位&#x2F;清位"></a>位测试&#x2F;置位&#x2F;清位</h3><ul>
+<li><code>tstbit(rX, #b)</code>：测试位 b（返回谓词&#x2F;用于 p0）</li>
+<li><code>setbit(rX, #b)</code>：设置位 b</li>
+<li><code>clrbit(rX, #b)</code>：清除位 b</li>
+<li><code>bitsclr(rX, #mask_or_bit)</code>: 测试位是否为0</li>
+</ul>
+<h2 id="控制流"><a href="#控制流" class="headerlink" title="控制流"></a>控制流</h2><h3 id="跳转"><a href="#跳转" class="headerlink" title="跳转"></a>跳转</h3><ul>
+<li><code>jump label</code>：无条件跳转</li>
+<li><code>if (p0) jump:t label</code>：条件跳转</li>
+<li><code>:t</code> &#x2F; <code>:nt</code>：分支形式&#x2F;预测提示。对语义可先忽略，当作 jump。</li>
+</ul>
+<h3 id="6-2-调用"><a href="#6-2-调用" class="headerlink" title="6.2 调用"></a>6.2 调用</h3><ul>
+<li><code>call func</code>：直接调用（目标在指令里）</li>
+<li><code>callr rX</code>：间接调用（函数指针）<ul>
+<li>例：<code>r0 = memw(r17++ #4); callr r0</code>：遍历函数指针表并调用</li>
+</ul>
+</li>
+</ul>
+<h3 id="6-3-返回-栈帧"><a href="#6-3-返回-栈帧" class="headerlink" title="6.3 返回&#x2F;栈帧"></a>6.3 返回&#x2F;栈帧</h3><ul>
+<li><code>allocframe(#imm)</code>：建立栈帧</li>
+<li><code>deallocframe</code>：撤销栈帧</li>
+<li><code>dealloc_return</code>：撤栈并返回（组合指令）</li>
+<li><code>jumpr lr</code>：跳回返回地址（return）</li>
+</ul>
+<h2 id="硬件零开销循环"><a href="#硬件零开销循环" class="headerlink" title="硬件零开销循环"></a>硬件零开销循环</h2><ul>
+<li><code>loop0(target, rN)</code>：设置 loop0，重复执行从当前位置到 <code>:endloop0</code> 的区间 <code>rN</code> 次，回跳目标为 <code>target</code></li>
+<li><code>:endloop0</code>：循环结束边界标记（不是普通指令）</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123; loop0(loc_219DC, r10) ... &#125;</span><br><span class="line"></span><br><span class="line">... &#125; :endloop0</span><br></pre></td></tr></table></figure>
+
+<p>通常相当于 <code>for (i = 0; i &lt; r10; i++) &#123; ... &#125;</code></p>
+<h2 id="原子-锁：memw-locked"><a href="#原子-锁：memw-locked" class="headerlink" title="原子&#x2F;锁：memw_locked"></a>原子&#x2F;锁：<code>memw_locked</code></h2><ul>
+<li><p><code>r0 = memw_locked(addr)</code>：带 reservation 的 load（类似 load-linked）</p>
+</li>
+<li><p><code>memw_locked(addr, p0) = rX</code>：条件 store（类似 store-conditional），成功与否反映在谓词 <code>p0</code>（或由汇编约定给出）</p>
+</li>
+</ul>
+<blockquote>
+<p>reservation: 是指 CPU 在执行一条“锁定加载” 时，建立的仅对于该线程有效的监视状态。如果立刻尝试“条件写回”同一个位置，并且在此期间没人改过它，就允许这次写回成功</p>
+</blockquote>
+<h2 id="trap0-1"><a href="#trap0-1" class="headerlink" title="trap0(#1)"></a>trap0(#1)</h2><p>用于进入内核   类似int8</p>
+<h2 id="lilac-ctf-Gateway"><a href="#lilac-ctf-Gateway" class="headerlink" title="lilac-ctf Gateway"></a>lilac-ctf Gateway</h2><p>这个题目就用到了 <code>hexagon</code> 架构。</p>
+<p>交互逻辑中有输入的就只有输入<code>ip</code>。</p>
+<p>尝试输入一个很长的内容</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">❯ ./qemu-hexagon pwn</span><br><span class="line">=== Lilac Gate Way ===</span><br><span class="line">1. Manage.</span><br><span class="line">2. Reset.</span><br><span class="line">3. Exit.</span><br><span class="line">1</span><br><span class="line">=== Lilac Gate Way ===</span><br><span class="line">1. Register Service.</span><br><span class="line">2. Delete Service.</span><br><span class="line">3. Show Service.</span><br><span class="line">172.16.0.1:7777|Location Lookup Serviceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span><br><span class="line">Input ip:port|description</span><br><span class="line">Example:</span><br><span class="line">172.16.0.1:7777|Location Lookup Service</span><br><span class="line">&lt;&lt;[1]    8122 bus error  ./qemu-hexagon pwn</span><br></pre></td></tr></table></figure>
+
+<p>出现了<code>bus error</code> 应该是越界了</p>
+<p>对于这种陌生的架构 <code>IDA</code>中可以通过定位字符串的方式定位函数。</p>
+<p>找 “172.16.0.1:7777|Location Lookup Service”</p>
+<p>很快就找到了 在 sub_20FD0:  </p>
+<p>重命名为<code>register</code></p>
+<p><img src="/2026/02/06/hexagon%E6%9E%B6%E6%9E%84/manage.png" loading="lazy"></p>
+<p>可以猜测出在hexagon中应该是通过r0在传参数</p>
+<p>这里面用了三个关键函数</p>
+<p>有一个显然时puts</p>
+<p>还有 剩下两个</p>
+<p>可以用<code>strace</code>来跟踪系统调用进行猜测</p>
+<p>这里我最初的判断是错误的 我猜测第一个是readinput</p>
+<p>第二个是parse</p>
+<p>后来看 xref 发现 几乎每次put后都跟着readinput 说明它应该不是readinput 可能是刷新缓冲区的操作。</p>
+<p> 那么后面那个就是<code>readinput</code></p>
+<p>前面一个指令<code>r0 = add(fp, #-0x68)</code> 中看，这样推测也更为合理。</p>
+<p>然后就需要考虑<code>hexagon</code>的栈结构。搜索后发现和<code>x86</code>差不多。</p>
+<p>可以写脚本先输入(0x6D)字符验证。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[*] Got EOF while reading in interactive</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">[*] Interrupted</span></span><br><span class="line">[*] Process &#x27;/home/juryorca/pwn/lilac/Gateway/qemu-hexagon&#x27; stopped with exit code -7 (SIGBUS) (pid 12940)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>果然直接bus error了</p>
+<p>而如果是0x69 0x6a这样还能稍微撑一会 应该是栈被迁移的特征</p>
+<p>show的时候会少显示一个字符 猜测是回车前的字符自动截断变成\x00</p>
+<p>然后就是找gadget的事情了，这里我直接搬一个网上wp找的gedget</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0x217e4:</span><br><span class="line">text:000217E4                 &#123; r17:16 = memd(sp + #0x10+var_8)</span><br><span class="line">.text:000217E6                   r19:18 = memd(sp + #0x10+var_10) &#125;</span><br><span class="line">.text:000217E8                 &#123; dealloc_return &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">.text:<span class="number">000214F</span>4                 &#123; r0 = r16 &#125;</span><br><span class="line">.text:<span class="number">000214F</span>8                 &#123; r1 = r17 &#125;</span><br><span class="line">.text:<span class="number">000214F</span>C                 &#123; r2 = r18 &#125;</span><br><span class="line">.text:<span class="number">00021500</span>                 &#123; r6 = r19 &#125;</span><br><span class="line">.text:<span class="number">00021504</span>                 &#123; trap0(#<span class="number">1</span>) &#125;</span><br></pre></td></tr></table></figure>
+
+<p>栈的地址未知 可以通过栈迁移的方式 。</p>
+<p>从程序的交互行为中可以推测出 应该是存储了输出到某个值</p>
+<p>应该是存储到了bss段 这个逆向我实在看不懂</p>
+<p><a target="_blank" rel="noopener" href="https://rocketma.dev/2026/01/27/gateway/">https://rocketma.dev/2026/01/27/gateway/</a> 提到了动调 有这个应该好调很多。</p>
+<p>目前来看应该是存到了bss 开头位置</p>
+<p>然后打ROP</p>
+</div></section><div id="reward-container"><span class="hty-icon-button button-glow" id="reward-button" title="打赏" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === &quot;none&quot;) ? &quot;block&quot; : &quot;none&quot;;"><span class="icon iconify" data-icon="ri:hand-coin-line"></span></span><div id="reward-comment">v我50.</div><div id="qr" style="display:none;"><div style="display:inline-block"><a href="/QRpay/WechatPay.jpg"><img loading="lazy" src="/QRpay/WechatPay.jpg" alt="微信" title="微信"></a><div><span style="color:#2DC100"><span class="icon iconify" data-icon="ri:wechat-pay-line"></span></span></div></div></div></div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>py</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="http://juryorca.github.io/2026/02/06/hexagon%E6%9E%B6%E6%9E%84/" title="hexagon架构">http://juryorca.github.io/2026/02/06/hexagon%E6%9E%B6%E6%9E%84/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>本博客所有文章除特别声明外，均默认采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" title="CC BY-NC-SA 4.0 "><span class="icon iconify" data-icon="ri:creative-commons-line"></span><span class="icon iconify" data-icon="ri:creative-commons-by-line"></span><span class="icon iconify" data-icon="ri:creative-commons-nc-line"></span><span class="icon iconify" data-icon="ri:creative-commons-sa-line"></span></a> 许可协议。</li></ul></article><div class="post-nav"><div class="post-nav-item"><a class="post-nav-prev" href="/2026/02/16/%E7%BD%91%E7%BB%9C%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%B1%BB%E5%9E%8B%E9%80%86%E5%90%91%E4%BB%A5%E5%8F%8A%E5%88%A9%E7%94%A8/" rel="prev" title="网络多线程类型逆向以及利用"><span class="icon iconify" data-icon="ri:arrow-left-s-line"></span><span class="post-nav-text">网络多线程类型逆向以及利用</span></a></div><div class="post-nav-item"><a class="post-nav-next" href="/2026/01/15/PORE/" rel="next" title="PORE"><span class="post-nav-text">PORE</span><span class="icon iconify" data-icon="ri:arrow-right-s-line"></span></a></div></div></div><div class="hty-card" id="comment"></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2019 – 2026 </span><span class="with-love" id="animate"><span class="icon iconify" data-icon="ri:cloud-line"></span></span><span class="author"> py</span></div><div class="powered"><span>由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v7.3.0</span><span class="footer-separator">|</span><span>主题 - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.10.11</span></div></footer></div><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><span class="icon iconify" data-icon="ri:arrow-up-s-line"></span><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a><script src="https://fastly.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script><script>const images = [...document.querySelectorAll('.markdown-body img')]
+mediumZoom(images)</script><style>.medium-zoom-image {
+  z-index: 99;
+}</style></body></html>
